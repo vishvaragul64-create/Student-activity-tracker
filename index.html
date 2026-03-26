@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Activity Tracker</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f6f9;
+}
+
+/* Header */
+header {
+    background: #4CAF50;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+/* Container */
+.container {
+    padding: 20px;
+}
+
+/* Activity Card */
+.activity {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Completed style */
+.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+
+/* Button */
+button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.complete-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.reset-btn {
+    background: red;
+    color: white;
+    margin-top: 15px;
+}
+
+/* Progress */
+.progress {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .activity {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    button {
+        margin-top: 10px;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>Student Activity Tracker</h1>
+</header>
+
+<div class="container">
+
+    <h2>Activity List</h2>
+
+    <div id="activityList"></div>
+
+    <div class="progress" id="progressText"></div>
+
+    <button class="reset-btn" onclick="resetProgress()">Reset Progress</button>
+
+</div>
+
+<script>
+// Default activities
+const defaultActivities = [
+    { id: 1, name: "Learn HTML", completed: false },
+    { id: 2, name: "Practice CSS", completed: false },
+    { id: 3, name: "JavaScript Basics", completed: false },
+    { id: 4, name: "Build Mini Project", completed: false },
+    { id: 5, name: "Debug Code", completed: false },
+    { id: 6, name: "Revise Concepts", completed: false }
+];
+
+// Load from localStorage or default
+let activities = JSON.parse(localStorage.getItem("activities")) || defaultActivities;
+
+// Render activities
+function renderActivities() {
+    const list = document.getElementById("activityList");
+    list.innerHTML = "";
+
+    activities.forEach(activity => {
+        const div = document.createElement("div");
+        div.className = "activity";
+
+        const title = document.createElement("span");
+        title.textContent = activity.name;
+
+        if (activity.completed) {
+            title.classList.add("completed");
+        }
+
+        const button = document.createElement("button");
+        button.className = "complete-btn";
+        button.textContent = activity.completed ? "Completed" : "Mark Complete";
+
+        button.disabled = activity.completed;
+
+        button.onclick = () => {
+            activity.completed = true;
+            saveData();
+            renderActivities();
+        };
+
+        div.appendChild(title);
+        div.appendChild(button);
+
+        list.appendChild(div);
+    });
+
+    updateProgress();
+}
+
+// Update progress text
+function updateProgress() {
+    const completed = activities.filter(a => a.completed).length;
+    const total = activities.length;
+
+    document.getElementById("progressText").textContent =
+        `Progress: ${completed} / ${total} activities completed`;
+}
+
+// Save to localStorage
+function saveData() {
+    localStorage.setItem("activities", JSON.stringify(activities));
+}
+
+// Reset progress
+function resetProgress() {
+    activities = defaultActivities.map(a => ({ ...a, completed: false }));
+    saveData();
+    renderActivities();
+}
+
+// Initial render
+renderActivities();
+</script>
+
+</body>
+</html>
